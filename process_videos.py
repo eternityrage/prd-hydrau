@@ -6,6 +6,15 @@ import shutil
 def is_ffmpeg_available():
     return shutil.which('ffmpeg') is not None
 
+def get_video_dimensions(input_path):
+    try:
+        cmd = ['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', input_path]
+        out = subprocess.check_output(cmd, text=True).strip()
+        w, h = map(int, out.split(','))
+        return w, h
+    except Exception:
+        return 720, 1280
+
 def process_video(input_path, output_dir='Processed_Videos'):
     if not is_ffmpeg_available():
         print("[WARN] ffmpeg not found in PATH. Skipping ffmpeg processing.")
@@ -21,9 +30,24 @@ def process_video(input_path, output_dir='Processed_Videos'):
 
     print(f"[PROCESS] Processing video: {filename}...")
 
+    w, h = get_video_dimensions(input_path)
+    # Remove Google Gemini watermark from the bottom-right corner
+    delogo_w = max(40, int(w * 0.13))
+    delogo_h = max(40, int(h * 0.09))
+    delogo_x = min(w - delogo_w - 2, int(w * 0.77))
+    delogo_y = min(h - delogo_h - 2, int(h * 0.87))
+
+    vf_filters = [
+        f"delogo=x={delogo_x}:y={delogo_y}:w={delogo_w}:h={delogo_h}",
+        "scale=1080:1920:force_original_aspect_ratio=decrease",
+        "pad=1080:1920:(ow-iw)/2:(oh-ih)/2",
+        "unsharp=3:3:0.8"
+    ]
+    vf_chain = ",".join(vf_filters)
+
     cmd = [
         'ffmpeg', '-y', '-i', input_path,
-        '-vf', 'scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,unsharp=3:3:0.8',
+        '-vf', vf_chain,
         '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11',
         '-c:v', 'libx264', '-preset', 'medium', '-crf', '23',
         '-c:a', 'aac', '-b:a', '128k',
