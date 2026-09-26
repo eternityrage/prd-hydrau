@@ -1,0 +1,84 @@
+import os
+import sys
+from dotenv import load_dotenv
+
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
+load_dotenv()
+
+def check_secrets():
+    # Google credentials check
+    has_google = bool(os.environ.get('GOOGLE_SERVICE_ACCOUNT_KEY') or os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
+    if not has_google:
+        print("[ERROR] Missing GOOGLE_SERVICE_ACCOUNT_KEY or GOOGLE_APPLICATION_CREDENTIALS")
+        sys.exit(1)
+
+    # Facebook credentials check
+    has_meta_token = bool(os.environ.get('META_LONG_LIVED_ACCESS_TOKEN'))
+    has_single_fb = bool(os.environ.get('FB_PAGE_ID') and os.environ.get('FB_PAGE_ACCESS_TOKEN'))
+
+    if not has_meta_token and not has_single_fb:
+        print("[ERROR] Missing Facebook credentials. Please provide either META_LONG_LIVED_ACCESS_TOKEN or (FB_PAGE_ID + FB_PAGE_ACCESS_TOKEN)")
+        sys.exit(1)
+
+    target_pages = os.environ.get('TARGET_FB_PAGE_IDS', '')
+    if target_pages:
+        pids = [p.strip() for p in target_pages.split(',') if p.strip()]
+        print(f"[OK] Multi-Page mode configured with {len(pids)} target Facebook page(s)")
+    elif has_single_fb:
+        print(f"[OK] Single Page mode configured with FB_PAGE_ID: {os.environ.get('FB_PAGE_ID')}")
+    else:
+        print("[OK] Meta token provided. Target pages will be auto-resolved from user account")
+
+    # Optional checks
+    if not os.environ.get('POLLINATIONS_API_KEY'):
+        print("[INFO] POLLINATIONS_API_KEY not set. Built-in high-converting fallback ASMR captions will be used.")
+
+    if os.environ.get('INSTAGRAM_ACCOUNT_ID'):
+        print(f"[OK] Instagram publishing enabled: {os.environ.get('INSTAGRAM_ACCOUNT_ID')}")
+
+    print("[OK] Environment validation successful.\n")
+
+def main():
+    print("=" * 60)
+    print("      PRD-HYDRAU - ASMR Hydraulic Press Video Pipeline")
+    print("=" * 60)
+
+    # Step 1: Validate secrets
+    check_secrets()
+
+    # Step 2: Fetch videos from Google Drive
+    print("\n--- Step 1: Fetching videos from Google Drive ---")
+    from google_drive_fetch import fetch_videos
+    new_videos = fetch_videos()
+    print(f"Videos fetched/checked: {len(new_videos)}")
+
+    # Step 3: Process videos
+    print("\n--- Step 2: Processing videos (1080x1920, ASMR audio norm) ---")
+    from process_videos import process_all_videos
+    processed = process_all_videos()
+    print(f"Videos ready for publication: {len(processed)}")
+
+    # Step 4: Publish to platforms
+    print("\n--- Step 3: Publishing to Facebook (Reels + Pinned Comments + Stories) ---")
+    from daily_publisher import run_daily_publish
+    results = run_daily_publish(processed)
+
+    # Summary
+    print("\n" + "=" * 60)
+    print("Pipeline Execution Summary:")
+    print(f"  Videos in library:    {len(new_videos)}")
+    print(f"  Videos processed:     {len(processed)}")
+    print(f"  Publish action items: {len(results)}")
+    for r in results:
+        status = r.get('status', 'unknown')
+        platform = r.get('platform', 'unknown')
+        page_name = r.get('page_name', r.get('page_id', ''))
+        vid = r.get('video_id', '')
+        comment_id = r.get('comment_id', '')
+        print(f"    - [{platform}] Page: {page_name} -> Status: {status} (Video ID: {vid}, Comment ID: {comment_id})")
+    print("=" * 60)
+
+if __name__ == '__main__':
+    main()
