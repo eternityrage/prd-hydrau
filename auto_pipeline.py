@@ -54,16 +54,41 @@ def main():
     new_videos = fetch_videos()
     print(f"Videos fetched/checked: {len(new_videos)}")
 
-    # Step 3: Process videos
-    print("\n--- Step 2: Processing videos (1080x1920, ASMR audio norm) ---")
-    from process_videos import process_all_videos
-    processed = process_all_videos()
-    print(f"Videos ready for publication: {len(processed)}")
+    # Step 3: Select video & process on demand
+    print("\n--- Step 2: Selecting and processing video on demand ---")
+    import glob
+    from daily_publisher import select_video, load_published, publish, save_published
+    from process_videos import process_video
+
+    raw_videos = glob.glob('Videos/*.mp4') + glob.glob('Videos/*.mov') + glob.glob('Videos/*.avi')
+    published = load_published()
+    selected_raw = select_video(raw_videos, published)
+
+    if not selected_raw:
+        print("[INFO] No videos available to publish.")
+        return
+
+    filename = os.path.basename(selected_raw)
+    print(f"[TARGET VIDEO] Selected: {filename}")
+
+    # Process only the selected video with FFmpeg
+    processed_path = process_video(selected_raw)
+    if not processed_path:
+        print(f"[ERROR] Failed to process video: {selected_raw}")
+        return
 
     # Step 4: Publish to platforms
     print("\n--- Step 3: Publishing to Facebook (Reels + Pinned Comments + Stories) ---")
-    from daily_publisher import run_daily_publish
-    results = run_daily_publish(processed)
+    publish_ig = bool(os.environ.get('INSTAGRAM_ACCOUNT_ID'))
+    results = publish(processed_path, publish_to_facebook=True, publish_to_instagram=publish_ig)
+
+    # Record
+    entry = {
+        'filename': filename,
+        'results': results
+    }
+    published.append(entry)
+    save_published(published)
 
     # Summary
     print("\n" + "=" * 60)
