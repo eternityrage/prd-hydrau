@@ -92,7 +92,8 @@ def main():
     print("\n" + "=" * 60)
     print("Pipeline Execution Summary:")
     print(f"  Videos in library:    {len(new_videos)}")
-    print(f"  Videos processed:     {len(processed)}")
+    print(f"  Selected video:       {filename}")
+    print(f"  Processed video:      {os.path.basename(processed_path)}")
     print(f"  Publish action items: {len(results)}")
     for r in results:
         status = r.get('status', 'unknown')
