@@ -132,9 +132,33 @@ def resolve_target_pages():
     """
     Resolves Facebook target pages and page access tokens.
     Supports:
-    1. TARGET_FB_PAGE_IDS (comma-separated list of page IDs) + META_LONG_LIVED_ACCESS_TOKEN
-    2. FB_PAGE_ID + FB_PAGE_ACCESS_TOKEN (single page fallback)
+    1. FB_PAGE_TOKENS_JSON (pre-stored dictionary mapping page_id -> {name, token})
+    2. TARGET_FB_PAGE_IDS (comma-separated list of page IDs) + META_LONG_LIVED_ACCESS_TOKEN
+    3. FB_PAGE_ID + FB_PAGE_ACCESS_TOKEN (single page fallback)
     """
+    tokens_json_env = os.environ.get('FB_PAGE_TOKENS_JSON', '').strip()
+    if tokens_json_env:
+        try:
+            tokens_data = json.loads(tokens_json_env)
+            page_configs = []
+            for pid, info in tokens_data.items():
+                if isinstance(info, dict):
+                    page_configs.append({
+                        'id': str(pid),
+                        'name': info.get('name', f'Page {pid}'),
+                        'token': info.get('token')
+                    })
+                elif isinstance(info, str):
+                    page_configs.append({
+                        'id': str(pid),
+                        'name': f'Page {pid}',
+                        'token': info
+                    })
+            if page_configs:
+                return page_configs
+        except Exception as e:
+            print(f"[WARN] Failed to parse FB_PAGE_TOKENS_JSON: {e}")
+
     meta_token = os.environ.get('META_LONG_LIVED_ACCESS_TOKEN', '').strip()
     target_ids_env = os.environ.get('TARGET_FB_PAGE_IDS', '').strip()
     single_page_id = os.environ.get('FB_PAGE_ID', '').strip()
@@ -161,7 +185,6 @@ def resolve_target_pages():
                 else:
                     print(f"[WARN] Target page ID {pid} not found in accessible accounts.")
         else:
-            # If no specific target IDs, use any pages found
             for pid, info in tokens_map.items():
                 page_configs.append({
                     'id': pid,

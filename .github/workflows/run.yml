@@ -27,6 +27,7 @@ jobs:
         env:
           META_LONG_LIVED_ACCESS_TOKEN: ${{ secrets.META_LONG_LIVED_ACCESS_TOKEN }}
           TARGET_FB_PAGE_IDS: ${{ secrets.TARGET_FB_PAGE_IDS }}
+          FB_PAGE_TOKENS_JSON: ${{ secrets.FB_PAGE_TOKENS_JSON }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
           GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
