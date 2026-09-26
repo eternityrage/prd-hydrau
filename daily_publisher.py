@@ -3,6 +3,7 @@ import sys
 import json
 import random
 import re
+import urllib.parse
 import requests
 from upload.upload_facebook import upload_reel, upload_story, get_page_tokens
 
@@ -37,6 +38,50 @@ def extract_subject_from_filename(filename):
     name = re.sub(r'^(hydraulic\s+press\s+(crushing|crushes|vs)\s+)', '', name, flags=re.IGNORECASE).strip()
     return name or "fresh juicy fruits"
 
+def clean_caption(text, subject="fruits"):
+    if not text:
+        return None
+    # 1. Remove think tags
+    text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL | re.IGNORECASE)
+    # 2. Filter reasoning / meta lines
+    lines = text.split('\n')
+    filtered_lines = []
+    for line in lines:
+        l = line.strip()
+        if re.search(r'^(role\s*:?\s*assistant|reasoning\s*:|thought\s*:|thinking\s*:)', l, re.IGNORECASE):
+            continue
+        if re.search(r'^(here\s+is|here\'s|as\s+requested|certainly|sure,|note:|\*using\s+key|\*this\s+caption|---)', l, re.IGNORECASE):
+            continue
+        filtered_lines.append(line)
+    text = '\n'.join(filtered_lines)
+    # 3. Remove Title / Description / Caption / Hashtags labels
+    text = re.sub(r'\*\*(title|description|caption|hashtags)[^\*]*\*\*[:\s]*', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'^(title|description|caption|hashtags)\s*:\s*', '', text, flags=re.IGNORECASE | re.MULTILINE)
+    # 4. Remove Pollinations ads / footers
+    text = re.sub(r'(Support\s+Pollinations|Powered\s+by\s+Pollinations|🌸\s*Ad\s*🌸).*$', '', text, flags=re.IGNORECASE | re.DOTALL).strip()
+    # 5. Remove quotes, asterisks, and normalize spaces
+    text = text.replace('"', '').replace('“', '').replace('”', '').replace('*', '').strip()
+    text = re.sub(r'\s+', ' ', text).strip()
+
+    # 5. Blacklist check - if ANY meta/reasoning words remain, reject
+    blacklist = [
+        'role assistant', 'assistant reasoning', 'reasoning', '<think>',
+        'we must produce', 'here is a', 'title:', 'description:',
+        'seo optimized', 'social media post', 'char)'
+    ]
+    lower_text = text.lower()
+    for bad in blacklist:
+        if bad in lower_text:
+            return None
+
+    if len(text) < 25:
+        return None
+
+    if len(text) > 280:
+        text = text[:280].rsplit(' ', 1)[0]
+
+    return text
+
 def generate_caption(filename=""):
     pollinations_key = os.environ.get('POLLINATIONS_API_KEY', '').strip()
     subject = extract_subject_from_filename(filename) if filename else "fresh fruits"
@@ -44,33 +89,35 @@ def generate_caption(filename=""):
     if not pollinations_key:
         return get_fallback_caption(subject)
 
-    prompt = (
-        f"Generate a viral, search-engine-optimized (SEO) social media title and description for an ASMR hydraulic press video. "
-        f"The video features a heavy hydraulic press crushing {subject} and extracting extreme satisfying juice with crisp ASMR sound. "
-        f"Include high-ranking keywords like Hydraulic Press, ASMR Juice Extraction, Satisfying Crunch, Oddly Satisfying. "
-        f"Include popular hashtags (#hydraulicpress #asmr #oddlysatisfying #crush #fruitjuice #satisfying). "
-        f"Keep the entire text engaging, viral, and under 250 characters."
+    system_prompt = (
+        "You are an expert social media copywriter for viral short-form Facebook Reels. "
+        "OUTPUT ONLY the final single-line caption with hashtags. "
+        "NEVER output your thoughts, NEVER output reasoning, NEVER output role tags, "
+        "and NEVER use labels like Title: or Description:. "
+        "Start immediately with an emoji and the hook."
+    )
+    user_prompt = (
+        f"Write a viral, exciting ASMR caption for a 100-ton hydraulic press crushing {subject} "
+        f"and extracting extreme satisfying juice with crisp ASMR sound. "
+        f"Include high-ranking hashtags (#hydraulicpress #asmr #oddlysatisfying #crush #fruitjuice #satisfying). "
+        f"Under 220 characters."
     )
 
     try:
-        resp = requests.post(
-            'https://text.pollinations.ai/',
-            json={
-                'messages': [{'role': 'user', 'content': prompt}],
-                'model': 'openai',
-                'seed': random.randint(1, 999999)
-            },
-            headers={'Authorization': f'Bearer {pollinations_key}'},
-            timeout=30
-        )
+        url = f"https://text.pollinations.ai/{urllib.parse.quote(user_prompt)}"
+        params = {
+            'system': system_prompt,
+            'model': 'openai',
+            'seed': random.randint(1, 999999)
+        }
+        headers = {'Authorization': f'Bearer {pollinations_key}'} if pollinations_key else {}
+        resp = requests.get(url, params=params, headers=headers, timeout=20)
         if resp.status_code == 200:
-            caption = resp.text.strip()
-            # Clean quotes if any
-            if caption.startswith('"') and caption.endswith('"'):
-                caption = caption[1:-1].strip()
-            if len(caption) > 280:
-                caption = caption[:277] + '...'
-            return caption
+            cleaned = clean_caption(resp.text, subject)
+            if cleaned:
+                return cleaned
+            else:
+                print(f"  [WARN] Pollinations response contained meta/reasoning or failed validation. Using fallback.")
     except Exception as e:
         print(f"  [WARN] Pollinations caption generation failed: {e}")
 
