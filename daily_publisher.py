@@ -159,48 +159,18 @@ def resolve_target_pages():
         except Exception as e:
             print(f"[WARN] Failed to parse FB_PAGE_TOKENS_JSON: {e}")
 
-    meta_token = os.environ.get('META_LONG_LIVED_ACCESS_TOKEN', '').strip()
-    target_ids_env = os.environ.get('TARGET_FB_PAGE_IDS', '').strip()
+    # Fallback to single page
     single_page_id = os.environ.get('FB_PAGE_ID', '').strip()
     single_page_token = os.environ.get('FB_PAGE_ACCESS_TOKEN', '').strip()
 
-    page_configs = []
-
-    # Strategy A: Use META_LONG_LIVED_ACCESS_TOKEN to query target pages
-    if meta_token:
-        target_ids = [pid.strip() for pid in target_ids_env.split(',') if pid.strip()] if target_ids_env else []
-        if single_page_id and single_page_id not in target_ids:
-            target_ids.append(single_page_id)
-
-        tokens_map = get_page_tokens(meta_token, target_page_ids=target_ids if target_ids else None)
-
-        if target_ids:
-            for pid in target_ids:
-                if pid in tokens_map:
-                    page_configs.append({
-                        'id': pid,
-                        'name': tokens_map[pid].get('name', f'Page {pid}'),
-                        'token': tokens_map[pid].get('access_token')
-                    })
-                else:
-                    print(f"[WARN] Target page ID {pid} not found in accessible accounts.")
-        else:
-            for pid, info in tokens_map.items():
-                page_configs.append({
-                    'id': pid,
-                    'name': info.get('name'),
-                    'token': info.get('access_token')
-                })
-
-    # Strategy B: Single page fallback
-    if not page_configs and single_page_id and single_page_token:
-        page_configs.append({
+    if single_page_id and single_page_token:
+        return [{
             'id': single_page_id,
             'name': 'Primary Facebook Page',
             'token': single_page_token
-        })
+        }]
 
-    return page_configs
+    return []
 
 def publish_to_facebook_pages(video_path, caption, pinned_comment, page_configs):
     """

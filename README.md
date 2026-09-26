@@ -20,10 +20,8 @@ Automated content pipeline for **ASMR Hydraulic Press & Fruit Juice Extraction**
 
 ### GitHub Secrets
 
-| Secret | Required | Description |
-|---|---|---|
-| `META_LONG_LIVED_ACCESS_TOKEN` | Yes | Meta long-lived user access token (resolves page tokens dynamically) |
-| `TARGET_FB_PAGE_IDS` | Recommended | Comma-separated list of 5-6 target Facebook Page IDs |
+| `FB_PAGE_TOKENS_JSON` | Yes | Pre-resolved Facebook Page Access Tokens map for target pages |
+| `TARGET_FB_PAGE_IDS` | Yes | Comma-separated list of target Facebook Page IDs |
 | `GOOGLE_SERVICE_ACCOUNT_KEY` | Yes | Google Service Account JSON credentials |
 | `GOOGLE_DRIVE_FOLDER_ID` | Yes | Google Drive folder ID containing raw videos (`1NbBvT_JHzlPaG83U6f5aSNFdyNqbNgjn`) |
 | `POLLINATIONS_API_KEY` | Optional | Pollinations AI key for dynamic SEO ASMR caption generation |

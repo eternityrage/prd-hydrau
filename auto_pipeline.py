@@ -15,11 +15,11 @@ def check_secrets():
         sys.exit(1)
 
     # Facebook credentials check
-    has_meta_token = bool(os.environ.get('META_LONG_LIVED_ACCESS_TOKEN'))
+    has_tokens_json = bool(os.environ.get('FB_PAGE_TOKENS_JSON'))
     has_single_fb = bool(os.environ.get('FB_PAGE_ID') and os.environ.get('FB_PAGE_ACCESS_TOKEN'))
 
-    if not has_meta_token and not has_single_fb:
-        print("[ERROR] Missing Facebook credentials. Please provide either META_LONG_LIVED_ACCESS_TOKEN or (FB_PAGE_ID + FB_PAGE_ACCESS_TOKEN)")
+    if not has_tokens_json and not has_single_fb:
+        print("[ERROR] Missing Facebook credentials. Please provide either FB_PAGE_TOKENS_JSON or (FB_PAGE_ID + FB_PAGE_ACCESS_TOKEN)")
         sys.exit(1)
 
     target_pages = os.environ.get('TARGET_FB_PAGE_IDS', '')
@@ -28,8 +28,6 @@ def check_secrets():
         print(f"[OK] Multi-Page mode configured with {len(pids)} target Facebook page(s)")
     elif has_single_fb:
         print(f"[OK] Single Page mode configured with FB_PAGE_ID: {os.environ.get('FB_PAGE_ID')}")
-    else:
-        print("[OK] Meta token provided. Target pages will be auto-resolved from user account")
 
     # Optional checks
     if not os.environ.get('POLLINATIONS_API_KEY'):
