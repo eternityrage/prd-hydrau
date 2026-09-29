@@ -274,14 +274,32 @@ def publish(video_path, publish_to_facebook=True, publish_to_instagram=False):
             results.extend(fb_results)
 
     if publish_to_instagram:
-        from upload.upload_instagram import upload_reel as ig_reel, upload_story as ig_story
-        ig_account_id = os.environ.get('INSTAGRAM_ACCOUNT_ID', '').strip()
-        single_page_token = os.environ.get('FB_PAGE_ACCESS_TOKEN', '').strip()
+        from upload.upload_instagram import upload_reel as ig_reel
+        ig_account_id = os.environ.get('INSTAGRAM_ACCOUNT_ID', '').strip() or '17841423367645382'
+        deepthrust_token = None
+        if 'pages' in locals() and pages:
+            for p in pages:
+                if p.get('id') == '1319562641243817' or 'deepthrust' in p.get('name', '').lower():
+                    deepthrust_token = p.get('token')
+                    break
+            if not deepthrust_token and pages:
+                deepthrust_token = pages[0].get('token')
+        if not deepthrust_token:
+            deepthrust_token = os.environ.get('FB_PAGE_ACCESS_TOKEN', '').strip()
 
-        if ig_account_id:
-            print(f"\n[IG] Publishing to Instagram: {ig_account_id}")
-            results.append(ig_reel(video_path, caption, page_token=single_page_token, ig_account_id=ig_account_id))
-            results.append(ig_story(video_path, page_token=single_page_token, ig_account_id=ig_account_id))
+        if ig_account_id and deepthrust_token:
+            print(f"\n[IG] Publishing exclusively to Instagram Reels tab (no profile grid): {ig_account_id} (DeepThrust Lens)")
+            results.append(ig_reel(
+                video_path,
+                caption,
+                page_token=deepthrust_token,
+                ig_account_id=ig_account_id,
+                share_to_feed=False  # Exclusively on Reels tab, NEVER on profile grid
+            ))
+        elif not ig_account_id:
+            print("\n[SKIP] INSTAGRAM_ACCOUNT_ID not configured.")
+        elif not deepthrust_token:
+            print("\n[SKIP] Access token for DeepThrust Lens not found for Instagram.")
 
     return results
 

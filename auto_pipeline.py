@@ -98,10 +98,10 @@ def main():
     for r in results:
         status = r.get('status', 'unknown')
         platform = r.get('platform', 'unknown')
-        page_name = r.get('page_name', r.get('page_id', ''))
-        vid = r.get('video_id', '')
+        target = r.get('page_name') or r.get('page_id') or ('DeepThrust Lens (Instagram)' if platform == 'instagram' else platform)
+        vid = r.get('video_id') or r.get('media_id', '')
         comment_id = r.get('comment_id', '')
-        print(f"    - [{platform}] Page: {page_name} -> Status: {status} (Video ID: {vid}, Comment ID: {comment_id})")
+        print(f"    - [{platform}] Target: {target} -> Status: {status} (Media ID: {vid}, Comment ID: {comment_id})")
     print("=" * 60)
 
 if __name__ == '__main__':
