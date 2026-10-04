@@ -1776,5 +1776,71 @@
         "media_id": "18345794716265491"
       }
     ]
+  },
+  {
+    "filename": "Hydraulic_press_crushing_sliced_\u2026_20260926031623.mp4",
+    "results": [
+      {
+        "status": "success",
+        "platform": "facebook",
+        "page_id": "1319562641243817",
+        "video_id": "2996790264013284",
+        "comment_id": "2996790264013284_1618150679849968",
+        "page_name": "DeepThrust Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook_story",
+        "page_id": "1319562641243817",
+        "page_name": "DeepThrust Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook",
+        "page_id": "1396611686858888",
+        "video_id": "1105276388538883",
+        "comment_id": "1105276388538883_1412025954468363",
+        "page_name": "Pressed Tunes"
+      },
+      {
+        "status": "success",
+        "platform": "facebook_story",
+        "page_id": "1396611686858888",
+        "page_name": "Pressed Tunes"
+      },
+      {
+        "status": "success",
+        "platform": "facebook",
+        "page_id": "1339129032621410",
+        "video_id": "4030158220619990",
+        "comment_id": "4030158220619990_1616347359878522",
+        "page_name": "PressedLab Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook_story",
+        "page_id": "1339129032621410",
+        "page_name": "PressedLab Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook",
+        "page_id": "1417861724738756",
+        "video_id": "3993071490823498",
+        "comment_id": "3993071490823498_4542966372697985",
+        "page_name": "PressView Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook_story",
+        "page_id": "1417861724738756",
+        "page_name": "PressView Lens"
+      },
+      {
+        "status": "success",
+        "platform": "instagram",
+        "media_id": "18098787830183517"
+      }
+    ]
   }
 ]
