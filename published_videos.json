@@ -2106,5 +2106,71 @@
         "media_id": "18430874941148542"
       }
     ]
+  },
+  {
+    "filename": "Hydraulic_press_crushes_kiwi_fruit_20260926031624.mp4",
+    "results": [
+      {
+        "status": "success",
+        "platform": "facebook",
+        "page_id": "1319562641243817",
+        "video_id": "1740563117055902",
+        "comment_id": "1740563117055902_1081117377863808",
+        "page_name": "DeepThrust Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook_story",
+        "page_id": "1319562641243817",
+        "page_name": "DeepThrust Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook",
+        "page_id": "1396611686858888",
+        "video_id": "1359009966047616",
+        "comment_id": "1359009966047616_1125895436560872",
+        "page_name": "Pressed Tunes"
+      },
+      {
+        "status": "success",
+        "platform": "facebook_story",
+        "page_id": "1396611686858888",
+        "page_name": "Pressed Tunes"
+      },
+      {
+        "status": "success",
+        "platform": "facebook",
+        "page_id": "1339129032621410",
+        "video_id": "1124543080129510",
+        "comment_id": "1124543080129510_1408300104192135",
+        "page_name": "PressedLab Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook_story",
+        "page_id": "1339129032621410",
+        "page_name": "PressedLab Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook",
+        "page_id": "1417861724738756",
+        "video_id": "970123525498072",
+        "comment_id": "970123525498072_1478818277405954",
+        "page_name": "PressView Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook_story",
+        "page_id": "1417861724738756",
+        "page_name": "PressView Lens"
+      },
+      {
+        "status": "success",
+        "platform": "instagram",
+        "media_id": "18083257208336875"
+      }
+    ]
   }
 ]
