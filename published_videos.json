@@ -2436,5 +2436,71 @@
         "media_id": "17966836494178082"
       }
     ]
+  },
+  {
+    "filename": "Hydraulic_press_crushing_pineapple_20260926031623.mp4",
+    "results": [
+      {
+        "status": "success",
+        "platform": "facebook",
+        "page_id": "1319562641243817",
+        "video_id": "1454472049895870",
+        "comment_id": "1454472049895870_28392580247089186",
+        "page_name": "DeepThrust Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook_story",
+        "page_id": "1319562641243817",
+        "page_name": "DeepThrust Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook",
+        "page_id": "1396611686858888",
+        "video_id": "1622006329709665",
+        "comment_id": "1622006329709665_1834384181349840",
+        "page_name": "Pressed Tunes"
+      },
+      {
+        "status": "success",
+        "platform": "facebook_story",
+        "page_id": "1396611686858888",
+        "page_name": "Pressed Tunes"
+      },
+      {
+        "status": "success",
+        "platform": "facebook",
+        "page_id": "1339129032621410",
+        "video_id": "1122840533531746",
+        "comment_id": "1122840533531746_1668481194886291",
+        "page_name": "PressedLab Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook_story",
+        "page_id": "1339129032621410",
+        "page_name": "PressedLab Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook",
+        "page_id": "1417861724738756",
+        "video_id": "1988093869267805",
+        "comment_id": "1988093869267805_1081082641431655",
+        "page_name": "PressView Lens"
+      },
+      {
+        "status": "success",
+        "platform": "facebook_story",
+        "page_id": "1417861724738756",
+        "page_name": "PressView Lens"
+      },
+      {
+        "status": "success",
+        "platform": "instagram",
+        "media_id": "17955622992250829"
+      }
+    ]
   }
 ]
